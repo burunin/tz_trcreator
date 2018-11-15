@@ -9,13 +9,13 @@ export class BtcController {
     constructor( private readonly btcService: BtcService) {}
 
     @Get()
-    async getUtxo(@Query("address") addressBtcDto: AddressBtcDto) {
-        // return this.btcService.getUtxo(addressBtcDto)
+    async getUtxo(@Query("address") addressBtcDto: AddressBtcDto["address"]) {
+        return this.btcService.getUtxo(addressBtcDto)
     }
 
     @Post() 
-    async createTr(@Body() inputAddressDto: InputAddressDto) {
-        return this.btcService.createTr(inputAddressDto);
+    async generateTr(@Body() inputAddressDto: InputAddressDto) {
+        return this.btcService.generateTr(inputAddressDto);
     }
 
 }
