@@ -48,15 +48,16 @@ describe('BtcModule', () => {
       expect(btcService.getUtxo('')).toBeCalled()
     })
     it('findOptimal', () => {
-
+      btcService.findOptimal()
+      expect()
     })
 
     it('makeOptimalTr', () => {
-
+      btcService.makeOptimalTr()
     })
 
     it('generateTr', () => {
-      
+      btcService.generateTr()
     })
   })
 
