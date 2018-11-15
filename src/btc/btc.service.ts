@@ -22,6 +22,7 @@ export class BtcService {
 			.then(json => {
 				this.utxos = Object.assign(this.utxos, json).sort((a, b) => b.satoshis - a.satoshis)
 			})
+			.catch(err => console.log(err))
 	}
 	findOptimal(amount: number) {
 		
