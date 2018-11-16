@@ -70,12 +70,11 @@ describe("BtcModule", () => {
 			expect(btcService.findOptimal(555)).toEqual(result)
 		});
 
-		it("makeOptimalTr", () => {
+		it("makeOptimalTr", async () => {
 
 			const oneInputComission = 225 * 17 * 0.00000001;
-			let comission = oneInputComission;
-
-			btcService.utxos = [
+			const addInputComnission = 147 * 17 * 0.00000001;
+			btcService.resultUtxos = [
 				new Utxo({
 					address: 'fff',
 					amount: 0.11
@@ -87,7 +86,12 @@ describe("BtcModule", () => {
 				new Utxo({
 					address: '1ff',
 					amount: 0.4
-				})]
+				}),
+				new Utxo({
+					address: '1ff',
+					amount: 0.5
+				}),
+			]
 
 			const body = {
 				amount: 0.01,
@@ -103,32 +107,33 @@ describe("BtcModule", () => {
 				from: "eiiidi",
 				to: "dkdkdkkdkd"
 			};
+			let comission = oneInputComission + 
+			(btcService.resultUtxos.length && btcService.resultUtxos.length * addInputComnission);
 			const res = {
 				amount_in: body.amount,
 				amount_out: body.amount + comission,
 				fee: comission,
-				resultUtxos: [],
+				resultUtxos: [0.11, 0.2, 0.4, 0.5],
 				totalUtxo: btcService.utxos.map(a => a.amount),
 			};
 			const res2 = {
 				amount_in: body3.amount,
 				amount_out: body3.amount + comission,
 				fee: comission,
+				resultUtxos: [0.11, 0.2, 0.4, 0.5],
 				totalUtxo: btcService.utxos.map(a => a.amount),
-				resultUtxos: []
 			};
-
-			expect(btcService.makeOptimalTr(body)).toEqual(res);
-			expect(btcService.makeOptimalTr(body2)).toEqual("No amount specified");
 			const res3 = {
 				amount_in: body3.amount,
 				amount_out: body3.amount + comission,
 				fee: comission,
 				totalUtxo: btcService.utxos.map(a => a.amount),
-				resultUtxos: btcService.resultUtxos.map(a => a.amount)
+				resultUtxos: [0.11, 0.2, 0.4, 0.5]
 			};
-			expect(btcService.makeOptimalTr(body3)).toEqual(res3)
 
+			expect(await btcService.makeOptimalTr(body)).toEqual(res);
+			expect(await btcService.makeOptimalTr(body2)).toEqual("No amount specified");
+			expect(await btcService.makeOptimalTr(body3)).toEqual(res3)
 		});
 
 		it("generateTr", async () => {
