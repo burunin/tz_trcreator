@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Utxo } from './interfaces/utxo.interface';
 import { InputBtc } from './interfaces/input-btc.interface';
-import fetch from 'node-fetch';
+import axios from 'axios';
 
 @Injectable()
 export class BtcService {
@@ -17,10 +17,10 @@ export class BtcService {
 	private addInputComnission = this.addInputWeight * this.oneByteCost * this.satoshiFromBTC;
 
 	getUtxo(address: string) {
-		return fetch(`https://insight.bitpay.com/api/addr/${address}/utxo`)
-			.then(res => res.json())
-			.then(json => {
-				this.utxos = Object.assign(this.utxos, json).sort((a, b) => b.satoshis - a.satoshis)
+		axios.get(`https://insight.bitpay.com/api/addr/${address}/utxo`)
+			.then(res => {
+				this.utxos = Object.assign(this.utxos, res.data).sort((a, b) => b.satoshis - a.satoshis)
+				return this.utxos;
 			})
 			.catch(err => console.log(err))
 	}
