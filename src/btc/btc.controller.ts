@@ -10,6 +10,9 @@ export class BtcController {
 
     @Get()
     async getUtxo(@Query("address") addressBtcDto: AddressBtcDto["address"]) {
+        if (!addressBtcDto) {
+             return "No address present, try again"
+        }
         return this.btcService.getUtxo(addressBtcDto)
     }
 

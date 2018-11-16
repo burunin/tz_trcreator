@@ -7,4 +7,11 @@ export class Utxo {
     readonly satoshis: number;
     readonly height: number;
     readonly confirmations: number;
+    constructor({
+        address: _address,
+        amount: _amount
+    }) {
+        this.address = _address;
+        this.amount = _amount;
+    }
 }

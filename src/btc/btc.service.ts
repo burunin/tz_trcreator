@@ -6,8 +6,8 @@ import axios from 'axios';
 @Injectable()
 export class BtcService {
 
-	private utxos: Utxo[] = [];
-	private resultUtxos: Utxo[] = [];
+	public utxos: Utxo[] = [];
+	public resultUtxos: Utxo[] = [];
 	readonly oneInOutWeight = 225
 	readonly oneByteCost = 17
 	readonly addInputWeight = 147
@@ -16,26 +16,42 @@ export class BtcService {
 	private oneInputComission = this.oneInOutWeight * this.oneByteCost * this.satoshiFromBTC;
 	private addInputComnission = this.addInputWeight * this.oneByteCost * this.satoshiFromBTC;
 
-	getUtxo(address: string) {
-		axios.get(`https://insight.bitpay.com/api/addr/${address}/utxo`)
-			.then(res => {
-				this.utxos = Object.assign(this.utxos, res.data).sort((a, b) => b.satoshis - a.satoshis)
-				return this.utxos;
-			})
-			.catch(err => console.log(err))
+	generateTr(body: InputBtc) {
+		this.getUtxo(body.from);
+		this.findOptimal(body.amount);
+		return this.makeOptimalTr(body);
 	}
+
+	getUtxo(address: string) {
+		if (!address) {
+			return 'No address passed, try again';
+		}
+		return axios.get(`https://insight.bitpay.com/api/addr/${address}/utxo`)
+			.then(res => {
+				if (res.status == 200) {
+					this.utxos = Object.assign(this.utxos, res.data).sort((a, b) => b.satoshis - a.satoshis)
+					return this.utxos
+				}
+				else {
+					return res.data;
+				}
+			})
+			.catch(err => {
+				return err.response.data
+			})
+	}
+	
 	findOptimal(amount: number) {
-		
+
 		let totalUtxos = this.utxos;
 		let amountIn = amount;
 
 		let singleChosen: any[] = [];
 		let multiChosen: any[] = [];
-		
 		let comission: number = 0;
 		
 		totalUtxos.forEach((e) => {
-			if ((amount + this.oneInputComission) <= e.amount) {
+			if (e.amount && (amount + this.oneInputComission) <= e.amount) {
 				singleChosen.push(e);
 			} else {
 				if (amountIn + this.oneInputComission + multiChosen.length*this.addInputComnission >= e.amount ) {
@@ -47,11 +63,20 @@ export class BtcService {
 				}
 			}
 		})
-		this.resultUtxos = (multiChosen.length ? multiChosen : [singleChosen.pop()])
+		if (multiChosen.length) {
+			this.resultUtxos = multiChosen
+		} else if (singleChosen.length) {
+			this.resultUtxos = [singleChosen.pop()]
+		} else {
+			this.resultUtxos = []
+		}
 		return this.resultUtxos
 	}
 	
 	makeOptimalTr(body) {
+		if (!body.amount) {
+			return 'No amount specified'
+		}
 		let comission = this.oneInputComission + 
 			( this.resultUtxos.length && this.resultUtxos.length * this.addInputComnission);
 		const res = {
@@ -62,11 +87,5 @@ export class BtcService {
 			resultUtxos: this.resultUtxos.map(a => a.amount)
 		}
 		return res;
-	}
-
-	generateTr(body: InputBtc) {
-		this.getUtxo(body.from);
-		this.findOptimal(body.amount);
-		return this.makeOptimalTr(body);
 	}
 }

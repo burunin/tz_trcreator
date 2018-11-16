@@ -1,3 +1,4 @@
+import { IsString } from 'class-validator';
 export class AddressBtcDto {
-    readonly address: string;
+    @IsString() address: string;
 }
