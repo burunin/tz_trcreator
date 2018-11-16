@@ -4,10 +4,10 @@ App to choose UTXOs for optimal transaction
 
 ## example Curls: 
 
-get UTXOs by address
-curl -s -H "Content-Type: application/json" -X GET "http://localhost:3000/tx?address=1Fooo19w8LN2pTpGzPu5hxgmbHzYr6C1KY"
-list UTXOs to use with `amount`
-curl -s -d '{"from":"1Fooo19w8LN2pTpGzPu5hxgmbHzYr6C1KY", "to":"15aQe4XKmXr4kPtb9UMTKceem7mNnLKD25", "amount": 0.001}' -H "Content-Type: application/json" -X POST "http://localhost:3000/tx"
+get UTXOs by address  
+curl -s -H "Content-Type: application/json" -X GET "http://localhost:3000/tx?address=1Fooo19w8LN2pTpGzPu5hxgmbHzYr6C1KY"  
+list UTXOs to use with `amount`  
+curl -s -d '{"from":"1Fooo19w8LN2pTpGzPu5hxgmbHzYr6C1KY", "to":"15aQe4XKmXr4kPtb9UMTKceem7mNnLKD25", "amount": 0.001}' -H "Content-Type: application/json" -X POST "http://localhost:3000/tx"  
 
 ## Installation
 
